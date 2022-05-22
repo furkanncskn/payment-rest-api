@@ -1,21 +1,18 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Tringle.API.Filters;
-using Tringle.Core.Repositories;
+using Tringle.API.Modules;
 using Tringle.Core.ResponseDtos;
-using Tringle.Core.Services;
-using Tringle.Repository;
-using Tringle.Repository.Repositories;
 using Tringle.Service.Exceptions;
 using Tringle.Service.Mappers;
-using Tringle.Services.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 // Fluent Validation yapýlandýrmasý
-
 builder.Services.AddControllers(p => p.Filters.Add(new AsyncValidationFilter())).AddFluentValidation(config =>
 {
     config.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
@@ -24,24 +21,15 @@ builder.Services.AddControllers(p => p.Filters.Add(new AsyncValidationFilter()))
     config.DisableDataAnnotationsValidation = true;
 }).ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
 
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Bagimliliklar
-builder.Services.AddScoped(typeof(ITringleRepository<>), typeof(TringleRepository<>));
-builder.Services.AddScoped(typeof(ITringleService<>), typeof(TringleService<>));
-
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-
-builder.Services.AddScoped(typeof(DataContext<>));
+// Autofac yapilandirmasi
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+        .ConfigureContainer<ContainerBuilder>(builder =>
+            builder.RegisterModule(new AutofacModule()
+        ));
 
 // AutoMapper yapilandirmasi
 builder.Services.AddAutoMapper(assemblies =>
