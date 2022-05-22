@@ -32,18 +32,6 @@ https://documenter.getpostman.com/view/20566920/UyxoijPm
 
 ---
 
-→ **ASP.NET Core** ve **.NET library** dosyalarına erişmek ve ASP.NET Core tabanlı yazılmış API uygulamasını çalıştırabilmek için image'i indirin.
-
-```powershell
-docker pull mcr.microsoft.com/dotnet/aspnet:6.0
-```
-
-→ Microsoft tarafından uygulamayı geliştirmek, oluşturmak veya test etmek amacıyla geliştirilmiş image dosyasını indirin. 
-
-```powershell
-docker pull mcr.microsoft.com/dotnet/sdk:6.0
-```
-
  → Projeye ait **Docker Hub** üzerinde ki repository de yer alan image dosyasını indirin.
 
 ```powershell
