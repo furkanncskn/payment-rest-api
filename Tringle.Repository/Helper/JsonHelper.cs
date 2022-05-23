@@ -36,17 +36,16 @@ namespace Tringle.Repository.Helper
             }
         }
 
-        public static async Task<T?> GetByIdFromJsonFileAsync<T>(string path, int id) where T : class, new()
+        public static async Task<T?> GetByIdFromJsonFileAsync<T>(string path, object id) where T : class, new()
         {
             Type type = typeof(T);
             PropertyInfo[] properties = type.GetProperties();
+            string? keyName = AttributeHelper.GetPropertiesInfoByAttribute<T>(typeof(KeyAttribute))?.Select(p => p.Name).SingleOrDefault();
             var list = await LoadJsonFromFileAsync<T>(path);
             foreach (var elem in list)
             {
-                if ((int)(properties?.SingleOrDefault(p => p.Name == "Id")?.GetValue(elem, null)!) == id)
-                {
-                    return elem;
-                }
+                object? keyValue = properties?.SingleOrDefault(p => p.Name == (keyName ?? string.Empty) || p.Name.ToUpper() == "ID")?.GetValue(elem, null);
+                if (keyValue?.Equals(id) == true) { return elem; }
             }
             return null;
         }
@@ -93,12 +92,16 @@ namespace Tringle.Repository.Helper
             var list = await LoadJsonFromFileAsync<T>(path);
             foreach (var entity in entities)
             {
-                int id = (int)properties?.SingleOrDefault(p => p.Name == "Id")?.GetValue(entity, null)!;
-                foreach (var elem in list)
+                object?[] values = properties?.Select(p => p.GetValue(entity, null))?.ToArray() ?? Array.Empty<object>(); ;
+                string? keyName = AttributeHelper.GetPropertiesInfoByAttribute<T>(typeof(KeyAttribute))?.Select(p => p.Name).SingleOrDefault();
+                PropertyInfo? keypPropertyInfo = properties?.SingleOrDefault(p => p.Name == (keyName ?? string.Empty) || p.Name.ToUpper() == "ID");
+                object? entityKeyValue = keypPropertyInfo?.GetValue(entity, null)!;
+                for (int i = 0; i < list.Count; i++)
                 {
-                    if ((int)properties?.SingleOrDefault(p => p.Name == "Id")?.GetValue(elem, null)! == id)
+                    object? keyValue = properties?.SingleOrDefault(p => p.Name == keyName)?.GetValue(list[i], null);
+                    if (keyValue?.Equals(entityKeyValue) == true)
                     {
-                        await Task.Run(() => list.Remove(elem));
+                        await Task.Run(() => list.Remove(list[i]));
                     }
                 }
             }
@@ -119,7 +122,7 @@ namespace Tringle.Repository.Helper
             {
                 object?[] values = properties?.Select(p => p.GetValue(entity, null))?.ToArray() ?? Array.Empty<object>(); ;
                 string? keyName = AttributeHelper.GetPropertiesInfoByAttribute<T>(typeof(KeyAttribute))?.Select(p => p.Name).SingleOrDefault();
-                PropertyInfo? keypPropertyInfo = properties?.SingleOrDefault(p => p.Name == (keyName ?? string.Empty));
+                PropertyInfo? keypPropertyInfo = properties?.SingleOrDefault(p => p.Name == (keyName ?? string.Empty) || p.Name.ToUpper() == "ID");
                 object? entityKeyValue = keypPropertyInfo?.GetValue(entity, null)!;
                 foreach (var elem in list)
                 {
