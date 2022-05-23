@@ -12,5 +12,10 @@ namespace Tringle.Services.Service
         {
             _accountRepository = accountRepository;
         }
+
+        public Task<bool> ExistAsync(Account account)
+        {
+            return _accountRepository.AnyAsync(p => p.AccountNumber == account.AccountNumber);
+        }
     }
 }
