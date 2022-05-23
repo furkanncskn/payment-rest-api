@@ -22,8 +22,7 @@ namespace Tringle.API.Controllers
         [HttpGet("{accountNumber}")]
         public async Task<IActionResult> Get(int accountNumber)
         {
-            var account = (await _accountService.WhereAsync(x => x.AccountNumber == accountNumber)).SingleOrDefault();
-            if (account == null) throw new NotFoundException($"{accountNumber} not exist.");
+            var account = await _accountService.GetByIdAsync(accountNumber) ?? throw new NotFoundException($"{accountNumber} not exist.");
             var accoutDto = _mapper.Map<AccountDto>(account);
             return CreateResult(ContentResponseDto<AccountDto>.Success(200, accoutDto));
         }
@@ -32,10 +31,7 @@ namespace Tringle.API.Controllers
         public async Task<IActionResult> Create(AccountDto accountDto)
         {
             var account = _mapper.Map<Account>(accountDto);
-            if (await _accountService.AnyAsync(p => p.AccountNumber == account.AccountNumber))
-            {
-                throw new ClientSideException($"Account number {accountDto.AccountNumber} exists.");
-            }
+            if (await _accountService.ExistAsync(account)) throw new ClientSideException($"Account number {accountDto.AccountNumber} exists.");
             await _accountService.AddAsync(account);
             return CreateResult(ContentResponseDto<AccountDto>.Success(201, accountDto));
         }
