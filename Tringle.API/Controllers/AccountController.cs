@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Tringle.Core.DTOs;
 using Tringle.Core.DTOs.ResponseDtos;
-using Tringle.Core.Entities;
 using Tringle.Core.Services;
 using Tringle.Service.Exceptions;
 
@@ -28,12 +27,10 @@ namespace Tringle.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(AccountDto accountDto)
+        public async Task<IActionResult> Create(PostAccountDto postAccountDto)
         {
-            var account = _mapper.Map<Account>(accountDto);
-            if (await _accountService.ExistAsync(account)) throw new ClientSideException($"Account number {accountDto.AccountNumber} exists.");
-            await _accountService.AddAsync(account);
-            return CreateResult(ContentResponseDto<AccountDto>.Success(201, accountDto));
+            await _accountService.Create(postAccountDto);
+            return CreateResult(ContentResponseDto<PostAccountDto>.Success(201, postAccountDto));
         }
     }
 }

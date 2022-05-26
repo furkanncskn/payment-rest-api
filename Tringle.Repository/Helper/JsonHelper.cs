@@ -138,5 +138,27 @@ namespace Tringle.Repository.Helper
             }
             await WriteToJsonFileAsync(path, list);
         }
+
+        public static async Task<bool> ExistAsync<T>(string path, T entity) where T : class, new()
+        {
+            Type type = typeof(T);
+            PropertyInfo[] properties = type.GetProperties();
+            object?[] values = properties?.Select(p => p.GetValue(entity, null))?.ToArray() ?? Array.Empty<object>(); ;
+            string? keyName = AttributeHelper.GetPropertiesInfoByAttribute<T>(typeof(KeyAttribute))?.Select(p => p.Name).SingleOrDefault();
+            PropertyInfo? keypPropertyInfo = properties?.SingleOrDefault(p => p.Name == (keyName ?? string.Empty) || p.Name.ToUpper() == "ID");
+            object? entityKeyValue = keypPropertyInfo?.GetValue(entity, null)!;
+
+            var list = await LoadJsonFromFileAsync<T>(path);
+            foreach (var elem in list)
+            {
+                object? keyValue = properties?.SingleOrDefault(p => p.Name == keyName)?.GetValue(elem, null);
+                if (keyValue?.Equals(entityKeyValue) == true)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

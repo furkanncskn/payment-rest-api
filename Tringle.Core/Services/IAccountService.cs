@@ -1,9 +1,10 @@
-﻿using Tringle.Core.Entities;
+﻿using Tringle.Core.DTOs;
+using Tringle.Core.Entities;
 
 namespace Tringle.Core.Services
 {
     public interface IAccountService : ITringleService<Account>
     {
-        Task<bool> ExistAsync(Account account);
+        Task Create(PostAccountDto postAccountDto);
     }
 }

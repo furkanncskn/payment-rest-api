@@ -13,5 +13,6 @@ namespace Tringle.Core.Services
         Task UpdateRangeAsync(IEnumerable<T> entities);
         Task DeleteAsync(T entity);
         Task DeleteRangeAsync(IEnumerable<T> entities);
+        Task<bool> ExistAsync(T entity);
     }
 }

@@ -9,6 +9,7 @@ namespace Tringle.Service.Mappers
         public AccountMapProfile()
         {
             CreateMap<AccountDto, Account>().ReverseMap();
+            CreateMap<PostAccountDto, Account>();
         }
     }
 }

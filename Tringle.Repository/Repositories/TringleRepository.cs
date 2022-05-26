@@ -33,6 +33,11 @@ namespace Tringle.Repository.Repositories
             await JsonHelper.DeleteRangeFromJsonFile(_context._path, entities);
         }
 
+        public async Task<bool> ExistAsync(T entity)
+        {
+            return await JsonHelper.ExistAsync(_context._path, entity);
+        }
+
         public async Task<IQueryable<T>> GetAllAsync()
         {
             return await JsonHelper.GetAllFromJsonFileAsync<T>(_context._path);
@@ -57,5 +62,6 @@ namespace Tringle.Repository.Repositories
         {
             return await JsonHelper.WhereJsonFile(_context._path, expression);
         }
+
     }
 }

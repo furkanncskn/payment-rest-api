@@ -3,20 +3,17 @@ using Tringle.Core.Enums;
 
 namespace Tringle.Core.DTOs
 {
-    public class AccountDto : BaseDto
+    public class PostAccountDto : BaseDto
     {
         [JsonPropertyOrder(2)]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public CurrencyCodes? CurrencyCode { get; set; }
 
-        [JsonPropertyOrder(4)]
+        [JsonPropertyOrder(3)]
         public string? OwnerName { get; set; }
 
-        [JsonPropertyOrder(5)]
+        [JsonPropertyOrder(4)]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public AccountTypes? AccountType { get; set; }
-
-        [JsonPropertyOrder(6)]
-        public decimal Balance { get; set; }
     }
 }

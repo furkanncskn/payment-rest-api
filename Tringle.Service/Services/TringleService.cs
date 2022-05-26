@@ -35,6 +35,11 @@ namespace Tringle.Services.Service
             await _repository.DeleteRangeAsync(entities);
         }
 
+        public async Task<bool> ExistAsync(T entity)
+        {
+            return await _repository.ExistAsync(entity);
+        }
+
         public async Task<IList<T>?> GetAllAsync()
         {
             return (await _repository.GetAllAsync()).ToList();

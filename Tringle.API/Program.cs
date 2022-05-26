@@ -2,11 +2,13 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
+using System.Reflection;
 using Tringle.API.Filters;
 using Tringle.API.Modules;
 using Tringle.Core.ResponseDtos;
 using Tringle.Service.Exceptions;
 using Tringle.Service.Mappers;
+using Tringle.Service.Validations.FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Fluent Validation yapýlandýrmasý
 builder.Services.AddControllers(p => p.Filters.Add(new AsyncValidationFilter())).AddFluentValidation(config =>
 {
-    config.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+    config.RegisterValidatorsFromAssemblies(new List<Assembly>
+    {
+        Assembly.GetAssembly(typeof(AccountDtoValidator))!,
+        Assembly.GetAssembly(typeof(DepositOrWithdrawDtoValidator))!,
+        Assembly.GetAssembly(typeof(PaymentDtoValidator))!,
+        Assembly.GetAssembly(typeof(PostAccountDtoValidator))!,
+    });
+
     config.ValidatorOptions.DefaultClassLevelCascadeMode = FluentValidation.CascadeMode.Continue;
     config.ValidatorOptions.DefaultRuleLevelCascadeMode = FluentValidation.CascadeMode.Stop;
     config.DisableDataAnnotationsValidation = true;
