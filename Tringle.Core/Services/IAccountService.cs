@@ -5,6 +5,7 @@ namespace Tringle.Core.Services
 {
     public interface IAccountService : ITringleService<Account>
     {
-        Task Create(PostAccountDto postAccountDto);
+        Task<AccountDto> GetAccountAsync(int accountNumber);
+        Task CreateAccountAsync(PostAccountDto postAccountDto);
     }
 }

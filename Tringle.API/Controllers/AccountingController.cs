@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Tringle.Core.DTOs;
 using Tringle.Core.DTOs.ResponseDtos;
 using Tringle.Core.Services;
-using Tringle.Service.Exceptions;
 
 namespace Tringle.API.Controllers
 {
@@ -21,10 +20,8 @@ namespace Tringle.API.Controllers
         [HttpGet("{accountNumber}")]
         public async Task<IActionResult> GetAllById(int accountNumber)
         {
-            var transactionHistory = (await _transactionService.WhereAsync(p => p.AccountNumber == accountNumber)).ToList();
-            if (transactionHistory == null || transactionHistory.Count == 0) throw new NotFoundException("Account history not found");
-            var transationHistoryDto = _mapper.Map<List<TransactionHistoryDto>>(transactionHistory);
-            return CreateResult(ContentResponseDto<List<TransactionHistoryDto>>.Success(200, transationHistoryDto));
+            var transactionHistroyDto = await _transactionService.GetAllByIdAsync(accountNumber);
+            return CreateResult(ContentResponseDto<List<TransactionHistoryDto>>.Success(200, transactionHistroyDto));
         }
     }
 }

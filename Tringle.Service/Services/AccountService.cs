@@ -19,7 +19,13 @@ namespace Tringle.Services.Service
             _mapper = mapper;
         }
 
-        public async Task Create(PostAccountDto postAccountDto)
+        public async Task<AccountDto> GetAccountAsync(int accountNumber)
+        {
+            var account = await _accountRepository.GetByIdAsync(accountNumber) ?? throw new NotFoundException($"{accountNumber} not exist.");
+            return _mapper.Map<AccountDto>(account);
+        }
+
+        public async Task CreateAccountAsync(PostAccountDto postAccountDto)
         {
             if (!Enum.IsDefined(typeof(CurrencyCodes), postAccountDto.CurrencyCode!)) throw new ClientSideException("Currency code is invalid.");
             if (!Enum.IsDefined(typeof(AccountTypes), postAccountDto.AccountType!)) throw new ClientSideException("Account type is invalid.");

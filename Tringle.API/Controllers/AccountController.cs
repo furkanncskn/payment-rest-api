@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Tringle.Core.DTOs;
 using Tringle.Core.DTOs.ResponseDtos;
 using Tringle.Core.Services;
-using Tringle.Service.Exceptions;
 
 namespace Tringle.API.Controllers
 {
@@ -19,17 +18,16 @@ namespace Tringle.API.Controllers
         }
 
         [HttpGet("{accountNumber}")]
-        public async Task<IActionResult> Get(int accountNumber)
+        public async Task<IActionResult> GetAccount(int accountNumber)
         {
-            var account = await _accountService.GetByIdAsync(accountNumber) ?? throw new NotFoundException($"{accountNumber} not exist.");
-            var accoutDto = _mapper.Map<AccountDto>(account);
-            return CreateResult(ContentResponseDto<AccountDto>.Success(200, accoutDto));
+            var accountDto = await _accountService.GetAccountAsync(accountNumber);
+            return CreateResult(ContentResponseDto<AccountDto>.Success(200, accountDto));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(PostAccountDto postAccountDto)
+        public async Task<IActionResult> CreateAccount(PostAccountDto postAccountDto)
         {
-            await _accountService.Create(postAccountDto);
+            await _accountService.CreateAccountAsync(postAccountDto);
             return CreateResult(ContentResponseDto<PostAccountDto>.Success(201, postAccountDto));
         }
     }

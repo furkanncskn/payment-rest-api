@@ -10,10 +10,12 @@ namespace Tringle.Services.Service
     public class PaymentService : TringleService<Account>, IPaymentService
     {
         private readonly IAccountRepository _accountRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
-        public PaymentService(ITringleRepository<Account> repository, IAccountRepository accountRepository) : base(repository)
+        public PaymentService(ITringleRepository<Account> repository, IAccountRepository accountRepository, ITransactionRepository transactionRepository) : base(repository)
         {
             _accountRepository = accountRepository;
+            _transactionRepository = transactionRepository;
         }
 
         public async Task PaymentAsync(PaymentDto paymentDto)
@@ -59,6 +61,14 @@ namespace Tringle.Services.Service
                 }
             });
             await _accountRepository.UpdateRangeAsync(account);
+
+            await _transactionRepository.AddAsync(new TransactionHistory()
+            {
+                AccountNumber = paymentDto.SenderAccount,
+                Amount = paymentDto.Amount,
+                CreatedAt = DateTime.Now,
+                TransactionType = Core.Enums.TransactionTypes.payment
+            });
         }
 
         public async Task DepositAsync(DepositOrWithdrawDto depositOrWithdrawDto)
@@ -74,6 +84,14 @@ namespace Tringle.Services.Service
 
             account.Balance += depositOrWithdrawDto.Amount;
             await _accountRepository.UpdateAsync(account);
+
+            await _transactionRepository.AddAsync(new TransactionHistory()
+            {
+                AccountNumber = depositOrWithdrawDto.AccountNumber,
+                Amount = depositOrWithdrawDto.Amount,
+                CreatedAt = DateTime.Now,
+                TransactionType = Core.Enums.TransactionTypes.deposit
+            });
         }
 
         public async Task WithdrawAsync(DepositOrWithdrawDto depositOrWithdrawDto)
@@ -93,6 +111,14 @@ namespace Tringle.Services.Service
 
             account.Balance -= depositOrWithdrawDto.Amount;
             await _accountRepository.UpdateAsync(account);
+
+            await _transactionRepository.AddAsync(new TransactionHistory()
+            {
+                AccountNumber = depositOrWithdrawDto.AccountNumber,
+                Amount = depositOrWithdrawDto.Amount,
+                CreatedAt = DateTime.Now,
+                TransactionType = Core.Enums.TransactionTypes.withdraw
+            });
         }
     }
 }
