@@ -13,13 +13,13 @@ git clone https://github.com/furkanncskn/payment-rest-api.git
 → **Dockerfile** dosyasının bulunduğu dizine gelerek CLI (Command Line Interface) ile beraber Dockerfile dosyası içerisinde yazan kodları çalıştırıp **image**'i oluşturun.
 
 ```powershell
-docker build -t furkanncskn/tringleapi:v1 .
+docker build -t furkanncskn/tringleapi:v1.1 .
 ```
 
 → Projeyi çalıştırabilmek için image dosyasını kullanarak bir **container** oluşturun.  Bu kod satırı ile beraber container’ın 80 numaralı portu ile yerel bilgisayarınız da ki 5050 numaralı port üzerinden haberleşme sağlanacaktır. 
 
 ```powershell
-docker run -p 5050:80 furkanncskn/tringleapi:v1
+docker run -p 5050:80 furkanncskn/tringleapi:v1.1
 ```
 
 → API ye ait dokümantasyonu oluşturmak ve bazı test işlemlerini gerçekleştirebilmek için **postman** aracı kullanılmıştır. Aşağıda ki link üzerinden bu dosyaya erişip gerekli test işlemlerini gerçekleştirebilirsiniz.
@@ -35,13 +35,13 @@ https://documenter.getpostman.com/view/20566920/UyxoijPm
  → Projeye ait **Docker Hub** üzerinde ki repository de yer alan image dosyasını indirin.
 
 ```powershell
-docker pull furkanncskn/tringleapi:v1
+docker pull furkanncskn/tringleapi:v1.1
 ```
 
 → Projeyi çalıştırabilmek için image dosyasını kullanarak bir container oluşturun.
 
 ```powershell
-docker run -p 5050:80 furkanncskn/tringleapi:v1
+docker run -p 5050:80 furkanncskn/tringleapi:v1.1
 ```
 
 → Aşağıda ki link üzerinden gerekli test işlemlerini gerçekleştirebilirsiniz.
