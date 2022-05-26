@@ -9,7 +9,6 @@ namespace Tringle.Core.DTOs
         public decimal Amount { get; set; }
 
         [JsonPropertyOrder(3)]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TransactionTypes? TransactionType { get; set; }
 
         [JsonPropertyOrder(4)]
