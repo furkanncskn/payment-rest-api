@@ -30,5 +30,19 @@ namespace Tringle.API.Controllers
             await _accountService.CreateAccountAsync(postAccountDto);
             return CreateResult(ContentResponseDto<PostAccountDto>.Success(201, postAccountDto));
         }
+
+        [HttpDelete("{accountNumber}")]
+        public async Task<IActionResult> DeleteAccount(int accountNumber)
+        {
+            await _accountService.DeleteAccountAsync(accountNumber);
+            return CreateResult(NoContentResponseDto.Success(204));
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateAccount(AccountDto accountDto)
+        {
+            await _accountService.UpdateAccountAsync(accountDto);
+            return CreateResult(NoContentResponseDto.Success(201));
+        }
     }
 }

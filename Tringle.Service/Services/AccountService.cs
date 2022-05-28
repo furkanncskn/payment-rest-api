@@ -33,5 +33,18 @@ namespace Tringle.Services.Service
             if (await _accountRepository.ExistAsync(account)) throw new ClientSideException($"Account number {postAccountDto.AccountNumber} exists.");
             await _accountRepository.AddAsync(account);
         }
+
+        public async Task DeleteAccountAsync(int accountNumber)
+        {
+            var account = _accountRepository.WhereAsync(account => account.AccountNumber == accountNumber).Result.SingleOrDefault();
+            if (account == null) throw new NotFoundException($"{accountNumber} not exist");
+            await _accountRepository.DeleteAsync(account);
+        }
+
+        public async Task UpdateAccountAsync(AccountDto accountDto)
+        {
+            var account = _mapper.Map<Account>(accountDto);
+            await _accountRepository.UpdateAsync(account);
+        }
     }
 }

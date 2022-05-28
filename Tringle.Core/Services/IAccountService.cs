@@ -7,5 +7,7 @@ namespace Tringle.Core.Services
     {
         Task<AccountDto> GetAccountAsync(int accountNumber);
         Task CreateAccountAsync(PostAccountDto postAccountDto);
+        Task DeleteAccountAsync(int accountNumber);
+        Task UpdateAccountAsync(AccountDto accountDto);
     }
 }
