@@ -23,7 +23,7 @@ namespace Tringle.Repository.Helper
 
         public static async Task WriteToJsonFileAsync<T>(string path, List<T> list) where T : class
         {
-            using FileStream fs = new(path, FileMode.Create, FileAccess.Write);
+            using FileStream fs = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
             if (fs.CanWrite)
             {
                 await JsonSerializer.SerializeAsync(fs, list, new JsonSerializerOptions()
