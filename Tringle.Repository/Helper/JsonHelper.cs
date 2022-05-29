@@ -3,37 +3,44 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 
 namespace Tringle.Repository.Helper
 {
     public static class JsonHelper
     {
+        private static SemaphoreSlim semaphore = new SemaphoreSlim(initialCount: 1);
+
         public static async Task<List<T>> LoadJsonFromFileAsync<T>(string path) where T : class, new()
         {
-            using FileStream fs = new(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            await semaphore.WaitAsync();
+            using FileStream fs = new(path, FileMode.OpenOrCreate, FileAccess.Read);
+            List<T> list = new();
             if (fs.Length > 0)
             {
-                var list = await JsonSerializer.DeserializeAsync<List<T>>(fs) ?? new List<T>();
+                list = await JsonSerializer.DeserializeAsync<List<T>>(fs) ?? new List<T>();
                 await fs.FlushAsync();
                 await fs.DisposeAsync();
-                return list;
             }
-            return new List<T>();
+            semaphore.Release();
+            return list;
         }
 
         public static async Task WriteToJsonFileAsync<T>(string path, List<T> list) where T : class
         {
-            using FileStream fs = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
+            await semaphore.WaitAsync();
+            using FileStream fs = new(path, FileMode.Create, FileAccess.Write);
             if (fs.CanWrite)
             {
                 await JsonSerializer.SerializeAsync(fs, list, new JsonSerializerOptions()
                 {
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                     WriteIndented = true
                 });
                 await fs.FlushAsync();
                 await fs.DisposeAsync();
             }
+            semaphore.Release();
         }
 
         public static async Task<T?> GetByIdFromJsonFileAsync<T>(string path, object id) where T : class, new()
