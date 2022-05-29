@@ -3,36 +3,55 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 
 namespace Tringle.Repository.Helper
 {
     public static class JsonHelper
     {
+        private static SemaphoreSlim semaphore = new SemaphoreSlim(initialCount: 1);
+
         public static async Task<List<T>> LoadJsonFromFileAsync<T>(string path) where T : class, new()
         {
-            using FileStream fs = new(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            if (fs.Length > 0)
+            try
             {
-                var list = await JsonSerializer.DeserializeAsync<List<T>>(fs) ?? new List<T>();
-                await fs.FlushAsync();
-                await fs.DisposeAsync();
+                await semaphore.WaitAsync();
+                using FileStream fs = new(path, FileMode.OpenOrCreate, FileAccess.Read);
+                List<T> list = new();
+                if (fs.Length > 0)
+                {
+                    list = await JsonSerializer.DeserializeAsync<List<T>>(fs) ?? new List<T>();
+                    await fs.FlushAsync();
+                    await fs.DisposeAsync();
+                }
                 return list;
             }
-            return new List<T>();
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public static async Task WriteToJsonFileAsync<T>(string path, List<T> list) where T : class
         {
-            using FileStream fs = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
-            if (fs.CanWrite)
+            try
             {
-                await JsonSerializer.SerializeAsync(fs, list, new JsonSerializerOptions()
+                await semaphore.WaitAsync();
+                using FileStream fs = new(path, FileMode.Create, FileAccess.Write);
+                if (fs.CanWrite)
                 {
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    WriteIndented = true
-                });
-                await fs.FlushAsync();
-                await fs.DisposeAsync();
+                    await JsonSerializer.SerializeAsync(fs, list, new JsonSerializerOptions()
+                    {
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        WriteIndented = true
+                    });
+                    await fs.FlushAsync();
+                    await fs.DisposeAsync();
+                }
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
 
