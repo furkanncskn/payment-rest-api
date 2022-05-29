@@ -13,34 +13,46 @@ namespace Tringle.Repository.Helper
 
         public static async Task<List<T>> LoadJsonFromFileAsync<T>(string path) where T : class, new()
         {
-            await semaphore.WaitAsync();
-            using FileStream fs = new(path, FileMode.OpenOrCreate, FileAccess.Read);
-            List<T> list = new();
-            if (fs.Length > 0)
+            try
             {
-                list = await JsonSerializer.DeserializeAsync<List<T>>(fs) ?? new List<T>();
-                await fs.FlushAsync();
-                await fs.DisposeAsync();
+                await semaphore.WaitAsync();
+                using FileStream fs = new(path, FileMode.OpenOrCreate, FileAccess.Read);
+                List<T> list = new();
+                if (fs.Length > 0)
+                {
+                    list = await JsonSerializer.DeserializeAsync<List<T>>(fs) ?? new List<T>();
+                    await fs.FlushAsync();
+                    await fs.DisposeAsync();
+                }
+                return list;
             }
-            semaphore.Release();
-            return list;
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public static async Task WriteToJsonFileAsync<T>(string path, List<T> list) where T : class
         {
-            await semaphore.WaitAsync();
-            using FileStream fs = new(path, FileMode.Create, FileAccess.Write);
-            if (fs.CanWrite)
+            try
             {
-                await JsonSerializer.SerializeAsync(fs, list, new JsonSerializerOptions()
+                await semaphore.WaitAsync();
+                using FileStream fs = new(path, FileMode.Create, FileAccess.Write);
+                if (fs.CanWrite)
                 {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true
-                });
-                await fs.FlushAsync();
-                await fs.DisposeAsync();
+                    await JsonSerializer.SerializeAsync(fs, list, new JsonSerializerOptions()
+                    {
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        WriteIndented = true
+                    });
+                    await fs.FlushAsync();
+                    await fs.DisposeAsync();
+                }
             }
-            semaphore.Release();
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public static async Task<T?> GetByIdFromJsonFileAsync<T>(string path, object id) where T : class, new()
