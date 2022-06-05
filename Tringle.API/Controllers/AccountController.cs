@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tringle.Core.DTOs;
 using Tringle.Core.DTOs.ResponseDtos;
 using Tringle.Core.Services;
@@ -9,12 +8,10 @@ namespace Tringle.API.Controllers
     public class AccountController : BaseContoller
     {
         private readonly IAccountService _accountService;
-        private readonly IMapper _mapper;
 
-        public AccountController(IAccountService service, IMapper mapper)
+        public AccountController(IAccountService service)
         {
             _accountService = service;
-            _mapper = mapper;
         }
 
         [HttpGet("{accountNumber}")]
